@@ -39,6 +39,7 @@ class Node
 
 	/**
 	 * @param int $col
+	 * @return $this
 	 */
 	public function setCol($col)
 	{
@@ -56,6 +57,7 @@ class Node
 
 	/**
 	 * @param int $row
+	 * @return $this
 	 */
 	public function setRow($row)
 	{
@@ -73,6 +75,7 @@ class Node
 
 	/**
 	 * @param int $val
+	 * @return $this
 	 */
 	public function setVal($val)
 	{
