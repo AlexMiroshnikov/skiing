@@ -16,11 +16,16 @@ require_once 'src/Detector.php';
 require_once 'src/Node.php';
 require_once 'src/Route.php';
 
-$map = \Skiing\Map::createFromSampleTextFile($filename);
-$detector = new \Skiing\Detector($map);
-$time = -microtime(true);
-$routes = $detector->getRoutes();
-$bestRoute = $detector->getBestRoute();
-echo "\nBest route: ".$bestRoute->getLength().' - '.$bestRoute->getDrop();
-echo "\nRoute details: ".$bestRoute->getNodesAsString();
-echo "\nTotal: time: ".round($time + microtime(true), 5).', mem: '.number_format(memory_get_peak_usage(true), 0, '.', ' ')."\n\n";
+try {
+	$map = \Skiing\Map::createFromSampleTextFile($filename);
+	$detector = new \Skiing\Detector($map);
+	$time = -microtime(true);
+	$routes = $detector->getRoutes();
+	$bestRoute = $detector->getBestRoute();
+	echo "\nBest route: ".$bestRoute->getLength().' - '.$bestRoute->getDrop();
+	echo "\nRoute details: ".$bestRoute->getNodesAsString();
+	echo "\nTotal: time: ".round($time + microtime(true), 3).'s, mem: '.number_format(memory_get_peak_usage(true), 0, '.', ' ')."kb\n\n";
+} catch (Exception $e) {
+	echo "\nAn error occurred:\n".$e->__toString()."\n";
+	exit(0);
+}
