@@ -1,6 +1,10 @@
 <?php
 namespace Skiing;
 
+/**
+ * Class Node
+ * @package Skiing
+ */
 class Node
 {
 	/** @var int */

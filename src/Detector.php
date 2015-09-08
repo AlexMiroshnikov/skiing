@@ -1,8 +1,10 @@
 <?php
-
 namespace Skiing;
 
-
+/**
+ * Class Detector
+ * @package Skiing
+ */
 class Detector
 {
 	/** @var Map */
@@ -189,26 +191,6 @@ class Detector
 
 		$this->_routes[] = $route;
 		$this->_maxKnownDrop = $route->getDrop();
-	}
-
-	/**
-	 * @param array $routes
-	 * @return Route
-	 */
-	private static function _sortByQualityIndex(array $routes)
-	{
-		$bestRoute = array_shift($routes);
-
-		/** @var Route $route */
-		foreach ($routes as $route)
-		{
-			if ($route->getQualityIndex() > $bestRoute->getQualityIndex())
-			{
-				$bestRoute = $route;
-			}
-		}
-
-		return $bestRoute;
 	}
 
 	/**

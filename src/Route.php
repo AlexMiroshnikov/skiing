@@ -1,6 +1,10 @@
 <?php
 namespace Skiing;
 
+/**
+ * Class Route
+ * @package Skiing
+ */
 class Route
 {
 	/** @var array */
@@ -60,16 +64,6 @@ class Route
 	{
 		reset($this->_nodes);
 		return (($node = current($this->_nodes)) ? $node->getVal() : null);
-	}
-
-	/**
-	 * @return float
-	 */
-	public function getQualityIndex()
-	{
-		$index = $this->getLength() + $this->getDrop();
-		$index += ($this->getDrop()/$index);
-		return $index;
 	}
 
 	/**

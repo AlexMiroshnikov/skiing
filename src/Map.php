@@ -1,7 +1,10 @@
 <?php
 namespace Skiing;
 
-
+/**
+ * Class Map
+ * @package Skiing
+ */
 class Map
 {
 	/** @var array */
@@ -29,7 +32,6 @@ class Map
 
 			if ($cols != $rows)
 			{
-				//echo "\ndata cols: ".$cols."\n";var_dump($row);echo "\n";
 				throw new \InvalidArgumentException('$data must be a square array');
 			}
 		}
