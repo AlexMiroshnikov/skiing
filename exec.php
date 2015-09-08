@@ -1,10 +1,22 @@
 <?php
+if (!isset($argv[1]))
+{
+	echo "\nUsage: php exec.php /path/to/map.txt\n";
+	exit(0);
+}
+
+if (!$filename = $argv[1])
+{
+	echo "\nError: empty filename\n";
+	exit(0);
+}
+
 require_once 'src/Map.php';
 require_once 'src/Detector.php';
 require_once 'src/Node.php';
 require_once 'src/Route.php';
 
-$map = \Skiing\Map::createFromSampleTextFile('./map.txt');
+$map = \Skiing\Map::createFromSampleTextFile($filename);
 $detector = new \Skiing\Detector($map);
 $time = -microtime(true);
 $routes = $detector->getRoutes();
