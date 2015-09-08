@@ -73,6 +73,24 @@ class Route
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getNodesAsString()
+	{
+		$nodes = array();
+
+		/**
+		 * @var Node $node
+		 */
+		foreach ($this->_nodes as $node)
+		{
+			$nodes[] = $node->getCol().','.$node->getRow().':'.$node->getVal();
+		}
+
+		return implode(' => ', $nodes);
+	}
+
+	/**
 	 * @param Node $node
 	 */
 	private function _validateNode(Node $node)

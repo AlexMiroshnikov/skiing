@@ -43,16 +43,21 @@ class Detector
 	{
 		$this->_init();
 
-		/** @var Node $node */
-		foreach ($this->_sortedValues as $node)
+		//** @var Node $node */
+		//foreach ($this->_sortedValues as $node)
+		/**
+		 * @var string $key
+		 * @var int $val
+		 */
+		foreach ($this->_sortedValues as $key => $val)
 		{
-			if ($node->getVal() < $this->_maxKnownDrop)
+			if ($val < $this->_maxKnownDrop)
 			{
 				break;
 			}
 
-			echo "\nproc sorted value ".$node->getVal().' ..';
-			$this->_tryRoute($node);
+			//$this->_tryRoute($node);
+			$this->_tryRouteValue($key, $val);
 		}
 
 		return $this->_routes;
@@ -85,13 +90,13 @@ class Detector
 			$route = new Route();
 		}
 
-		echo "\n trying route len ".$route->getLength().' ..';
+//		echo "\n trying route len ".$route->getLength().' ..';
 		$route->addNode($node);
 		$neighbours = $this->_getSuitableNeighbours($node);
 
 		if (!$neighbours)
 		{
-			echo "\n  adding route";
+//			echo "\n  adding route";
 			$this->_addRoute($route);
 		}
 		else
@@ -100,6 +105,39 @@ class Detector
 			{
 				$routeClone = clone $route;
 				$this->_tryRoute($neighbour, $routeClone);
+			}
+		}
+	}
+
+	/**
+	 * @param string $key
+	 * @param int $val
+	 * @param Route $route
+	 */
+	private function _tryRouteValue($key, $val, Route $route = null)
+	{
+		if (!$route)
+		{
+			$route = new Route();
+		}
+
+//		echo "\n trying route len ".$route->getLength().' ..';
+		$parts = explode(',', $key);
+		$node = Node::factory((int)$parts[0], (int)$parts[1], $val);
+		$route->addNode($node);
+		$neighbours = $this->_getSuitableNeighbours($node);
+
+		if (!$neighbours)
+		{
+//			echo "\n  adding route";
+			$this->_addRoute($route);
+		}
+		else
+		{
+			foreach ($neighbours as $nextKey => $neighbour)
+			{
+				$routeClone = clone $route;
+				$this->_tryRouteValue($nextKey, $neighbour, $routeClone);
 			}
 		}
 	}
@@ -126,20 +164,17 @@ class Detector
 				continue;
 			}
 
-			if ($this->_grid[$curCol][$curRow]->getVal() >= $val)
+			//if ($this->_grid[$curCol][$curRow]->getVal() >= $val)
+			if ($this->_grid[$curCol][$curRow] >= $val)
 			{
 				continue;
 			}
 
-			$neighbours[] = $this->_grid[$curCol][$curRow];
+			//$neighbours[] = $this->_grid[$curCol][$curRow];
+			$neighbours[self::_makeKeyByColRow($curCol, $curRow)] = $this->_grid[$curCol][$curRow];
 		}
 
-		/*
-		usort($neighbours, function(){
-
-		});
-		//*/
-
+		arsort($neighbours);
 		return $neighbours;
 	}
 
@@ -156,22 +191,23 @@ class Detector
 		{
 			foreach ($row as $colNum => $val)
 			{
-				//*
+				/*
 				$node = Node::factory($colNum, $rowNum, $val);
 				$this->_grid[$colNum][$rowNum] = $node;
 				$this->_sortedValues[] = $node;
 				//*/
-				/*
+				//*
 				$this->_grid[$colNum][$rowNum] = $val;
-				$this->_sortedValues[] = $val;
+				$this->_sortedValues[self::_makeKeyByColRow($colNum, $rowNum)] = $val;
 				//*/
 			}
 		}
 
 		echo "\n sort..";
-		usort($this->_sortedValues, function(Node $a, Node $b){
-			if ($a->getVal() > $b->getVal()) return -1;
-			if ($a->getVal() < $b->getVal()) return 1;
+		//usort($this->_sortedValues, function(Node $a, Node $b){
+		uasort($this->_sortedValues, function($a, $b){
+			if ($a > $b) return -1;
+			if ($a < $b) return 1;
 			return 0;
 		});
 		echo "\ninit finished";
@@ -234,5 +270,15 @@ class Detector
 		});
 		reset($routes);
 		return current($routes);
+	}
+
+	/**
+	 * @param int $col
+	 * @param int $row
+	 * @return string
+	 */
+	private static function _makeKeyByColRow($col, $row)
+	{
+		return $col.','.$row;
 	}
 }
