@@ -1,8 +1,10 @@
 <?php
-
 namespace Skiing;
 
-
+/**
+ * Class Detector
+ * @package Skiing
+ */
 class Detector
 {
 	/** @var Map */
@@ -43,8 +45,6 @@ class Detector
 	{
 		$this->_init();
 
-		//** @var Node $node */
-		//foreach ($this->_sortedValues as $node)
 		/**
 		 * @var string $key
 		 * @var int $val
@@ -56,8 +56,7 @@ class Detector
 				break;
 			}
 
-			//$this->_tryRoute($node);
-			$this->_tryRouteValue($key, $val);
+			$this->_tryRouteViaValue($key, $val);
 		}
 
 		return $this->_routes;
@@ -73,40 +72,8 @@ class Detector
 			$this->getRoutes();
 		}
 
-		//$bestRoute = self::_sortByQualityIndex($this->_routes);
 		$bestRoute = self::_usort($this->_routes);
-
 		return $bestRoute;
-	}
-
-	/**
-	 * @param Node $node
-	 * @param Route $route
-	 */
-	private function _tryRoute(Node $node, Route $route = null)
-	{
-		if (!$route)
-		{
-			$route = new Route();
-		}
-
-//		echo "\n trying route len ".$route->getLength().' ..';
-		$route->addNode($node);
-		$neighbours = $this->_getSuitableNeighbours($node);
-
-		if (!$neighbours)
-		{
-//			echo "\n  adding route";
-			$this->_addRoute($route);
-		}
-		else
-		{
-			foreach ($neighbours as $neighbour)
-			{
-				$routeClone = clone $route;
-				$this->_tryRoute($neighbour, $routeClone);
-			}
-		}
 	}
 
 	/**
@@ -114,14 +81,13 @@ class Detector
 	 * @param int $val
 	 * @param Route $route
 	 */
-	private function _tryRouteValue($key, $val, Route $route = null)
+	private function _tryRouteViaValue($key, $val, Route $route = null)
 	{
 		if (!$route)
 		{
 			$route = new Route();
 		}
 
-//		echo "\n trying route len ".$route->getLength().' ..';
 		$parts = explode(',', $key);
 		$node = Node::factory((int)$parts[0], (int)$parts[1], $val);
 		$route->addNode($node);
@@ -129,7 +95,6 @@ class Detector
 
 		if (!$neighbours)
 		{
-//			echo "\n  adding route";
 			$this->_addRoute($route);
 		}
 		else
@@ -137,7 +102,7 @@ class Detector
 			foreach ($neighbours as $nextKey => $neighbour)
 			{
 				$routeClone = clone $route;
-				$this->_tryRouteValue($nextKey, $neighbour, $routeClone);
+				$this->_tryRouteViaValue($nextKey, $neighbour, $routeClone);
 			}
 		}
 	}
@@ -164,13 +129,11 @@ class Detector
 				continue;
 			}
 
-			//if ($this->_grid[$curCol][$curRow]->getVal() >= $val)
 			if ($this->_grid[$curCol][$curRow] >= $val)
 			{
 				continue;
 			}
 
-			//$neighbours[] = $this->_grid[$curCol][$curRow];
 			$neighbours[self::_makeKeyByColRow($curCol, $curRow)] = $this->_grid[$curCol][$curRow];
 		}
 
@@ -184,33 +147,26 @@ class Detector
 	 */
 	private function _init()
 	{
-		echo "\ninit..";
 		$this->_routes = array();
 
 		foreach ($this->_map->getData() as $rowNum => $row)
 		{
 			foreach ($row as $colNum => $val)
 			{
-				/*
-				$node = Node::factory($colNum, $rowNum, $val);
-				$this->_grid[$colNum][$rowNum] = $node;
-				$this->_sortedValues[] = $node;
-				//*/
-				//*
 				$this->_grid[$colNum][$rowNum] = $val;
-				$this->_sortedValues[self::_makeKeyByColRow($colNum, $rowNum)] = $val;
-				//*/
+
+				if ($val)
+				{
+					$this->_sortedValues[self::_makeKeyByColRow($colNum, $rowNum)] = $val;
+				}
 			}
 		}
 
-		echo "\n sort..";
-		//usort($this->_sortedValues, function(Node $a, Node $b){
 		uasort($this->_sortedValues, function($a, $b){
 			if ($a > $b) return -1;
 			if ($a < $b) return 1;
 			return 0;
 		});
-		echo "\ninit finished";
 	}
 
 	/**
@@ -239,24 +195,8 @@ class Detector
 
 	/**
 	 * @param array $routes
-	 * @return Route
+	 * @return mixed
 	 */
-	private static function _sortByQualityIndex(array $routes)
-	{
-		$bestRoute = array_shift($routes);
-
-		/** @var Route $route */
-		foreach ($routes as $route)
-		{
-			if ($route->getQualityIndex() > $bestRoute->getQualityIndex())
-			{
-				$bestRoute = $route;
-			}
-		}
-
-		return $bestRoute;
-	}
-
 	private static function _usort(array $routes)
 	{
 		usort($routes, function(Route $a, Route $b){
@@ -268,6 +208,7 @@ class Detector
 			if ($a->getFirstVal() > $b->getFirstVal()) return -1;
 			return 0;
 		});
+
 		reset($routes);
 		return current($routes);
 	}
