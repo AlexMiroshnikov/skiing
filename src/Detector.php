@@ -90,6 +90,7 @@ class Detector
 		$parts = explode(',', $key);
 		$node = Node::factory((int)$parts[0], (int)$parts[1], $val);
 		$route->addNode($node);
+		//unset($this->_sortedValues[$key]);
 		$neighbours = $this->_getSuitableNeighbours($node);
 
 		if (!$neighbours)
@@ -161,6 +162,7 @@ class Detector
 			}
 		}
 
+		self::_log('sort max values..');
 		uasort($this->_sortedValues, function($a, $b){
 			if ($a > $b) return -1;
 			if ($a < $b) return 1;
@@ -188,8 +190,14 @@ class Detector
 			throw new \LogicException('Length '.$len.' is too large comparing to drop '.$drop);
 		}
 
+		if ($len > $this->_maxKnownLength)
+		{
+			$this->_routes = array();
+			self::_log("\tflush routes, ".$len);
+		}
+
 		$this->_routes[] = $route;
-		$this->_maxKnownLength = $route->getLength();
+		$this->_maxKnownLength = $len;
 	}
 
 	/**
