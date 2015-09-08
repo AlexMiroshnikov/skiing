@@ -22,6 +22,9 @@ class Detector
 	/** @var int */
 	private $_maxKnownDrop = 0;
 
+	/** @var int */
+	private $_maxKnownLength = 0;
+
 	/** @var array */
 	private static $deltas = array(
 		array(-1, 0),
@@ -43,7 +46,10 @@ class Detector
 	 */
 	public function getRoutes()
 	{
+		self::_log('init..');
 		$this->_init();
+
+		self::_log('iterate sorted values..');
 
 		/**
 		 * @var string $key
@@ -51,14 +57,10 @@ class Detector
 		 */
 		foreach ($this->_sortedValues as $key => $val)
 		{
-			if ($val < $this->_maxKnownDrop)
-			{
-				break;
-			}
-
 			$this->_tryRouteViaValue($key, $val);
 		}
 
+		self::_log('iterated!');
 		return $this->_routes;
 	}
 
@@ -179,7 +181,14 @@ class Detector
 			return;
 		}
 
+		/*
 		if ($route->getDrop() < $this->_maxKnownDrop)
+		{
+			return;
+		}
+		//*/
+
+		if ($route->getLength() < $this->_maxKnownLength)
 		{
 			return;
 		}
@@ -191,6 +200,7 @@ class Detector
 
 		$this->_routes[] = $route;
 		$this->_maxKnownDrop = $route->getDrop();
+		$this->_maxKnownLength = $route->getLength();
 	}
 
 	/**
@@ -199,17 +209,19 @@ class Detector
 	 */
 	private static function _usort(array $routes)
 	{
+		self::_log('sorting..');
 		usort($routes, function(Route $a, Route $b){
-			if ($a->getDrop() < $b->getDrop()) return 1;
-			if ($a->getDrop() > $b->getDrop()) return -1;
 			if ($a->getLength() < $b->getLength()) return 1;
 			if ($a->getLength() > $b->getLength()) return -1;
+			if ($a->getDrop() < $b->getDrop()) return 1;
+			if ($a->getDrop() > $b->getDrop()) return -1;
 			if ($a->getFirstVal() < $b->getFirstVal()) return 1;
 			if ($a->getFirstVal() > $b->getFirstVal()) return -1;
 			return 0;
 		});
 
 		reset($routes);
+		self::_log('sorted!');
 		return current($routes);
 	}
 
@@ -221,5 +233,13 @@ class Detector
 	private static function _makeKeyByColRow($col, $row)
 	{
 		return $col.','.$row;
+	}
+
+	/**
+	 * @param string $msg
+	 */
+	private static function _log($msg)
+	{
+		echo "\n\t".date('Y-m-d H:i:s')."\t".$msg;
 	}
 }
