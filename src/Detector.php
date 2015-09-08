@@ -20,9 +20,6 @@ class Detector
 	private $_routes = null;
 
 	/** @var int */
-	private $_maxKnownDrop = 0;
-
-	/** @var int */
 	private $_maxKnownLength = 0;
 
 	/** @var array */
@@ -181,13 +178,6 @@ class Detector
 			return;
 		}
 
-		/*
-		if ($route->getDrop() < $this->_maxKnownDrop)
-		{
-			return;
-		}
-		//*/
-
 		if ($route->getLength() < $this->_maxKnownLength)
 		{
 			return;
@@ -199,7 +189,6 @@ class Detector
 		}
 
 		$this->_routes[] = $route;
-		$this->_maxKnownDrop = $route->getDrop();
 		$this->_maxKnownLength = $route->getLength();
 	}
 
